@@ -1,21 +1,36 @@
 package model;
 
-public class Carta {
-    String tipo;
-    String color;
-    String valor;
+import java.util.*;
 
-    public Carta(String tipo, String color, String valor) {
+public class Carta {
+    private String tipo;
+    private String color;
+    private String numero;
+
+    public Carta(String tipo, String color, String numero) {
         this.tipo = tipo;
         this.color = color;
-        this.valor = valor;
+        this.numero = numero;
     }
 
+    public String getTipo() {
+        return tipo;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public String getNumero() {
+        return numero;
+    }
+
+    @Override
     public String toString() {
-        if (tipo.equals("Número")) {
-            return color + " " + valor;
+        if (this.tipo.equals("numero")) {
+            return this.color + " " + this.numero;
         } else {
-            return color + " " + tipo;
+            return this.color + " " + this.tipo;
         }
     }
 }

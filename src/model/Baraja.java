@@ -1,64 +1,87 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Baraja {
-    List<Carta> cartas;
+    private Stack<Carta> mazo;
+    private Stack<Carta> mazoDescarte;
 
     public Baraja() {
-        cartas = new ArrayList<>();
+
+        this.mazo = new Stack<>();
+        this.mazoDescarte = new Stack<>();
         String[] colors = {"Rojo", "Verde", "Azul", "Amarillo"};
-        String[] valores = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+        String[] numeros = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
         String[] especiales = {"Roba 2", "Revertir", "Salto"};
         int cartas_duplicadas = 2;
         int cambios_de_color = 8;
         int roba_4 = 4;
 
         for (String color : colors) {
-            for (String val : valores) {
-                if (val.equals("0")) {
-                    cartas.add(new Carta("numero", color, val));
+            for (String num : numeros) {
+                if (num.equals("0")) {
+                    this.mazo.push(new Carta("numero", color, num));
                 } else {
                     for (int i = 0; i < cartas_duplicadas; i++) {
-                        cartas.add(new Carta("numero", color, val));
+                        this.mazo.push(new Carta("numero", color, num));
                     }
                 }
             }
             for (String esp : especiales) {
                 for (int i = 0; i < cartas_duplicadas; i++) {
-                    cartas.add(new Carta(esp, color, null));
+                    this.mazo.push(new Carta(esp, color, null));
                 }
             }
         }
 
         for (int i = 0; i < cambios_de_color; i++) {
-            cartas.add(new Carta("Cambio de color", null, null));
+            this.mazo.push(new Carta("Cambio de color", null, null));
         }
 
         for (int i = 0; i < roba_4; i++) {
-            cartas.add(new Carta("Roba 4", null, null));
+            this.mazo.push(new Carta("Roba 4", null, null));
         }
 
-        Collections.shuffle(cartas);
+        Collections.shuffle(this.mazo);    
     }
 
-    public Carta sacarCarta(boolean carta_inicial) {
-        if (cartas.size() > 0 && carta_inicial) {
-            while (true) {
-                Carta cartaPop = cartas.remove(cartas.size() - 1);
-                if (cartaPop.tipo.equals("numero")) {
-                    return cartaPop;
-                } else {
-                    Collections.shuffle(cartas);
-                }
-            }
-        } else if (cartas.size() > 0) {
-            return cartas.remove(cartas.size() - 1);
-        } else {
+    public Carta sacar_carta(boolean carta_inicial) {
+
+        if (this.mazo.isEmpty() && this.mazoDescarte.isEmpty()) {
             System.out.println("La baraja está vacía.");
             return null;
+        } else if (this.mazo.isEmpty()) {
+            while (!this.mazoDescarte.isEmpty()) {
+                this.mazo.push(this.mazoDescarte.pop());
+            }
+            Collections.shuffle(this.mazo);
         }
+        Carta carta = this.mazo.pop();
+        if (carta_inicial ) {
+            while (true) {
+                System.out.println("en el ciclo");
+                if (carta.getTipo().equals("numero")) {
+                    this.mazoDescarte.push(carta);
+                    return carta;
+                } else {
+                    Collections.shuffle(this.mazo);
+                }
+            }
+            
+        }
+
+        return carta;    
+    }
+
+    public void descartarCarta(Carta carta) {
+        this.mazoDescarte.push(carta);
+    }
+
+    public Carta cartaSuperiorDescarte() {
+
+        if (this.mazoDescarte.isEmpty()) {
+            return null;
+        }
+        return this.mazoDescarte.peek();    
     }
 }

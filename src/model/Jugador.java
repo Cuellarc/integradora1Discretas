@@ -1,51 +1,59 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Jugador {
-    String nombre;
-    List<Carta> cartas;
+    private String nombre;
+    private Queue<Carta> mano;
 
     public Jugador(String nombre) {
         this.nombre = nombre;
-        this.cartas = new ArrayList<>();
+        this.mano = new LinkedList<>();
     }
 
-    public void recibirCarta(Carta carta) {
-        cartas.add(carta);
+    public void recibir_carta(Carta carta) {
+        this.mano.add(carta);
     }
 
-    public boolean jugarCarta(Carta carta, List<Carta> mesa, String color_actual) {
-        if (carta.tipo.equals("numero")) {
-            if (carta.color.equals(color_actual) || carta.valor.equals(mesa.get(mesa.size() - 1).valor)) {
-                mesa.add(carta);
-                cartas.remove(carta);
-                return true;
+    public Carta jugar_carta(Carta carta, Baraja baraja, String colorActual) {
+        if (carta.getTipo().equals("numero")) {
+            
+            if (carta.getColor().equals(colorActual) || carta.getNumero().equals(baraja.cartaSuperiorDescarte().getNumero())) {
+                this.mano.remove(carta);
+                baraja.descartarCarta(carta);
+                return carta;
             }
-        } else if (carta.tipo.equals("Cambio de color") || carta.tipo.equals("Roba 4")) {
-            mesa.add(carta);
-            cartas.remove(carta);
-            return true;
-        } else if (carta.tipo.equals("Roba 2") || carta.tipo.equals("Revertir") || carta.tipo.equals("Salto")) {
-            if (carta.color.equals(color_actual) || carta.tipo.equals(mesa.get(mesa.size() - 1).tipo)) {
-                mesa.add(carta);
-                cartas.remove(carta);
-                return true;
+        } else if (carta.getTipo().equals("Cambio de color") || carta.getTipo().equals("Roba 4")) {
+            this.mano.remove(carta);
+            baraja.descartarCarta(carta);
+            return carta;
+        } else if (Arrays.asList("Roba 2", "Revertir", "Salto").contains(carta.getTipo())) {
+            if (carta.getColor().equals(colorActual) || carta.getTipo().equals(baraja.cartaSuperiorDescarte().getTipo())) {
+                this.mano.remove(carta);
+                baraja.descartarCarta(carta);
+                return carta;
             }
         }
-        System.out.println("No puedes jugar esa carta.");
-        return false;
-    }
 
-    public boolean robarCarta(Baraja baraja) {
-        Carta carta = baraja.sacarCarta(false);
+        System.out.println("No puedes jugar esa carta.");
+        return null;    }
+
+    public Carta robar_carta(Baraja baraja) {
+        Carta carta = baraja.sacar_carta(false);
         if (carta != null) {
-            cartas.add(carta);
-            return true;
+            this.mano.add(carta);
+            return carta;
         } else {
             System.out.println("No quedan cartas en la baraja.");
-            return false;
-        }
+            return null;
+        }    
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public Queue<Carta> getMano() {
+        return mano;
     }
 }
